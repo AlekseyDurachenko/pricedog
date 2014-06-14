@@ -20,7 +20,6 @@ import urllib, re
 def fun_dns_callback(db, shop_name, link, dt):
     page = urllib.urlopen(link).read().replace(" ", "").replace(" ", "")
     for price in re.findall('<metaitemprop=\"price\"content=\"(\d+.\d+)\"', page):
-        print shop_name, link, dt, float(price), "rur"
         db.priceAdd(shop_name, link, dt, float(price), "rur")
     return True
 
