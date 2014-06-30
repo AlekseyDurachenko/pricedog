@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import sqlite3
+import sqlite3, os
 
 class DB:
     """This class used for access the database. The database structure:
@@ -52,7 +52,12 @@ class DB:
     """
     __conn = None
     def __init__(self):
-        self.__conn = sqlite3.connect('pricedog.db')
+        path = os.path.expanduser("~")      \
+                + os.path.sep + ".config"   \
+                + os.path.sep + "pricedog"
+        if not os.path.exists(path):
+            os.makedirs(path)
+        self.__conn = sqlite3.connect(os.path.join(path, 'pricedog.db'))
     def createTables(self):
         cursor = self.__conn.cursor();
         cursor.execute("""
