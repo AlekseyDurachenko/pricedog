@@ -24,9 +24,7 @@ if __name__ == "__main__":
     factory = Factory()
     timestamp = int(time.time())
     for row in db.taskList():
-        shop_name = row[0]
-        link = row[1]
-        fun = factory.fun(shop_name)
-        fun(db, shop_name, link, timestamp)
+        fun = factory.fun(row['shop_name'])
+        fun(db, row['shop_name'], row['link'], timestamp)
     sys.exit(0)
     

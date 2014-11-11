@@ -49,8 +49,17 @@ class DB:
 | currency  | string   |                | (rur,eur,e.t.c.)    |
 | comment   | string   |                | description         |
 --------------------------------------------------------------|
+
+--------------------------------------------------------------|
+| TWebPage (the source webpage of the task)                   |
+--------------------------------------------------------------|
+| id        | integer  | primary key    |                     |
+| TTaskId   | integer  |                |                     |
+| webpage   | string   |                | webpage             |
+--------------------------------------------------------------|
     """
     __conn = None
+    
     def __init__(self):
         path = os.path.expanduser("~")      \
                 + os.path.sep + ".config"   \
@@ -58,6 +67,8 @@ class DB:
         if not os.path.exists(path):
             os.makedirs(path)
         self.__conn = sqlite3.connect(os.path.join(path, 'pricedog.db'))
+        self.__conn.text_factory = str
+        
     def createTables(self):
         cursor = self.__conn.cursor();
         cursor.execute("""
@@ -81,29 +92,39 @@ class DB:
                 price REAL NOT NULL,
                 currency TEXT NOT NULL,
                 comment TEXT NOT NULL);""")
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS TWebPage(
+                id INTEGER PRIMARY KEY NOT NULL,
+                TTaskId INTEGER NOT NULL,
+                webpage TEXT NOT NULL);""")                
         self.__conn.commit()
+        
     # The shop operations #
     def shopAdd(self, name, comment = ""):
         cursor = self.__conn.cursor()
         cursor.execute("INSERT INTO TShop(name, comment) VALUES(?, ?)", (name, comment));
         self.__conn.commit()
+        
     def shopExists(self, name):
         cursor = self.__conn.cursor()
         for row in cursor.execute("SELECT * FROM TShop WHERE name = ?", (name,)):
             return True
         return False
+        
     def shopList(self):
         result = []
         cursor = self.__conn.cursor()
         for row in cursor.execute("SELECT name, comment FROM TShop"):
-            result.append([row[0], row[1]])
-        return result   
-    def taskAdd(self, shop_name, link):
+            result.append({"name":row[0], "comment":row[1]})
+        return result
+        
+    def taskAdd(self, shop_name, link, comment = ""):
         cursor = self.__conn.cursor();
         cursor.execute("""INSERT INTO TTask(TShopId, link, active, comment) 
-                VALUES((SELECT id FROM TShop WHERE name = ?), ?, 1, \"\")""", 
-                (shop_name, link))
+                VALUES((SELECT id FROM TShop WHERE name = ?), ?, 1, ?)""", 
+                (shop_name, link, comment))
         self.__conn.commit()
+        
     def taskExists(self, shop_name, link):
         cursor = self.__conn.cursor()
         for row in cursor.execute("""SELECT * FROM TTask 
@@ -111,12 +132,15 @@ class DB:
                 AND link = ?""", (shop_name, link)):
             return True
         return False
+    
     def taskList(self):
+        # nom -- number of measurements
         result = []
         cursor = self.__conn.cursor()
         for row in cursor.execute("SELECT name, link, (SELECT COUNT(*) FROM TPrice WHERE TTaskId = TTask.id) FROM TShop, TTask WHERE TTask.TShopId = TShop.id"):
-            result.append([row[0], row[1], row[2]])
+            result.append({"shop_name":row[0], "link":row[1], "nom":row[2]})
         return result
+        
     def taskRemove(self, shop_name, link):
         cursor = self.__conn.cursor()
         cursor.execute("""DELETE FROM TPrice WHERE TTaskId = 
@@ -127,10 +151,14 @@ class DB:
                 TShopId = (SELECT id FROM TShop WHERE name = ?) AND link = ?""",
                 (shop_name, link))
         self.__conn.commit()
-    def priceAdd(self, shop_name, link, dt, price, currency):
+        
+    def priceAdd(self, shop_name, link, dt, price, currency, webpage = None):
         cursor = self.__conn.cursor()
-        cursor.execute("""INSERT INTO TPrice(TTaskId, dt, price, currency, comment)
+        cursor.execute("""INSERT INTO TPrice(TTaskId, dt, price, currency, comment) 
                 VALUES((SELECT id FROM TTask WHERE TShopId = (SELECT id FROM TShop WHERE name = ?) 
                 AND link = ?), ?, ?, ?, ?)""", (shop_name, link, dt, price, currency, ""))
+        if webpage != None:
+            cursor.execute("""INSERT INTO TWebPage(TTaskId, webpage) 
+                VALUES((SELECT id FROM TTask WHERE TShopId = (SELECT id FROM TShop WHERE name = ?) 
+                AND link = ?), ?)""", (shop_name, link, webpage))
         self.__conn.commit()
- 

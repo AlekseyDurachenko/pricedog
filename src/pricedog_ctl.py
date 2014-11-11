@@ -29,7 +29,7 @@ def init(db):
 
 def shop_list(db):
     for shop in db.shopList():
-        print "* %s (%s)" % (shop[0], shop[1])
+        print "* %s (%s)" % (shop['name'], shop['comment'])
     sys.exit(0)
 
 def task_add(db, shop_name, link):
@@ -49,7 +49,7 @@ def task_remove(db, shop_name, link):
     
 def task_list(db):
     for task in db.taskList():
-        print "* %s %s (%s)" % (task[0], task[1], task[2])
+        print "* %s %s (%s)" % (task['shop_name'], task['link'], task['nom'])
     sys.exit(0)
 
 def print_usage():
@@ -67,16 +67,23 @@ Command details:
 
 # entry point
 if len(sys.argv) > 1:
+    # init
     if sys.argv[1] == "init":
         init(DB())
+    # shop <command>
     elif sys.argv[1] == "shop" and len(sys.argv) > 2:
+        # shop list
         if sys.argv[2] == "list":
             shop_list(DB())
+    # task <command>
     elif sys.argv[1] == "task" and len(sys.argv) > 2:
+        # task add <shop> <link>
         if sys.argv[2] == "add" and len(sys.argv) == 5:
             task_add(DB(), sys.argv[3], sys.argv[4])
+        # task remove <shop> <link>
         elif sys.argv[2] == "remove" and len(sys.argv) == 5:
             task_remove(DB(), sys.argv[3], sys.argv[4])
+        # task list
         elif sys.argv[2] == "list":
             task_list(DB())
 # invalid

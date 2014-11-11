@@ -18,9 +18,10 @@
 import urllib, re
 
 def fun_e2e4online_callback(db, shop_name, link, dt):
-    page = urllib.urlopen(link).read().replace(" ", "").replace(" ", "")
+    page_original = urllib.urlopen(link).read()
+    page = page_original.replace(" ", "").replace(chr(0xC2)+chr(0xA0), "").replace("&nbsp;", "")
     for price in re.findall('<spanclass=\"price\">(\d+)</span>руб.', page):
-        db.priceAdd(shop_name, link, dt, price, "rur")
+        db.priceAdd(shop_name, link, dt, price, "rur", page_original)
     return True
 
 def fun_e2e4online_key():

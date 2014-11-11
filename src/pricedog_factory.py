@@ -21,16 +21,21 @@ from pricedog_mod_dns import *
 class Factory:
     __fun = {}
     __comment = {}
+    
     def __init__(self):
         self.register(fun_e2e4online_key(), fun_e2e4online_comment(), fun_e2e4online_callback)
         self.register(fun_dns_key(), fun_dns_comment(), fun_dns_callback)
+        
     def register(self, key, comment, fun):
         self.__fun[key] = fun
         self.__comment[key] = comment
+        
     def keys(self):
         return self.__fun.keys()
+        
     def fun(self, key):
         return self.__fun[key]
+        
     def comment(self, key):
         return self.__comment[key]
    
