@@ -137,7 +137,7 @@ class DB:
         # nom -- number of measurements
         result = []
         cursor = self.__conn.cursor()
-        for row in cursor.execute("SELECT name, link, (SELECT COUNT(*) FROM TPrice WHERE TTaskId = TTask.id) FROM TShop, TTask WHERE TTask.TShopId = TShop.id"):
+        for row in cursor.execute("SELECT name, link, (SELECT COUNT(*) FROM (SELECT id FROM TPrice WHERE TTaskId = TTask.id GROUP BY dt)) FROM TShop, TTask WHERE TTask.TShopId = TShop.id"):
             result.append({"shop_name":row[0], "link":row[1], "nom":row[2]})
         return result
         
