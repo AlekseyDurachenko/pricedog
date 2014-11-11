@@ -162,3 +162,18 @@ class DB:
                 VALUES((SELECT id FROM TTask WHERE TShopId = (SELECT id FROM TShop WHERE name = ?) 
                 AND link = ?), ?)""", (shop_name, link, webpage))
         self.__conn.commit()
+    
+    def priceList(self, shop_name, link):
+        result = []
+        cursor = self.__conn.cursor()
+        query = """SELECT dt, MIN(price), MAX(price), currency from TPrice, TTask, TShop 
+                       WHERE TPrice.TTaskId = TTask.id 
+                           AND TShopId = TShop.id 
+                           AND TShop.name = ? 
+                           AND TTask.link = ?
+                       GROUP BY dt
+                       ORDER BY dt"""
+        for row in cursor.execute(query, (shop_name, link)):
+            result.append({"dt":row[0], "min":row[1], "max":row[2], "currency":row[3]})
+        return result
+        
