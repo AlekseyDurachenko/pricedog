@@ -1,28 +1,50 @@
-pricedog
-========
+# pricedog
+Набор скриптов позволяющий собирать информацию о стоимости товаров.
 
-Данный набор скриптов позволяет собирать информацию о стоимости товаров.
+На данный момент поддерживаются следующие магазины:
+* e2e4online (http://e2e4online.ru)
+* dns (http://dns-shop.ru)
 
-На текущий момент поддерживаются:
-* e2e4online
-* dns
+Настройки программы и собранная информация хранятся в файле
+базы данных SQLite: **$HOME/.config/pricedog/pricedog.db**
 
-Usage
-=====
-    
-Инициализация базы данных(следует сделать в первую очередь):
+## Зависимости
+* python >= 2.7
 
-    pricedog_ctrl.py init
+## Usage
+```bash
+=== pricedog control v0.1.0 ===
+Usage:
+    pricedog_ctl.py <command> <arg1> ... <argN>
+Command details:
+    init                       -- init the database
+    shop list                  -- show the shop list
+    task add <shop> <link>     -- add the new task
+    task remove <shop> <link>  -- remove the task
+    task list                  -- show the task list 
+    price list <shop> <link> [<step_in_days>]  -- show price list
+    price_machine list <shop> <link> [<step_in_days>]  -- machine redable pricelist
+```
 
-Добавление нового товара для отслеживания:
+Инициализация базы данных(следует сделать до начала использования программы):
+```bash
+pricedog_ctrl.py init
+```
 
-    pricedog_ctrl.py task add http://link_to_the_item/
+Добавление нового товара в список отслеживания стоимости:
+```bash
+pricedog_ctrl.py task add shop_name http://link_to_the_item/
+```
 
-Запуск сбора информации для добавленных товаров:
+Запуск сбора информации о стоимости товаров находящихся в списке отслеживания:
+```bash
+pricedog_execute.py
+```
 
-    pricedog_execute.py
-    
-Запуск pricedog_execute.py можно сделать через cron:
-
-    # Запускать скрипт ежедневно в 23:00
-    00 23 * * * ~/bin/pricedog_execute.py
+Запуск pricedog_execute.py можно прописать в cron:
+```bash
+# Запускать скрипт ежедневно в 23:00
+00 23 * * * /path/to/script/pricedog_execute.py
+# Запустить скрипт через 600 секунд после включения компьютера
+@reboot sleep 600 ; /path/to/script/pricedog_execute.py
+```

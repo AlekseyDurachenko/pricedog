@@ -75,7 +75,7 @@ def price_machine_list(db, shop_name, link, lag_in_seconds=0):
 
 
 def print_usage():
-    print """=== pricedog cotrol v.1.0 ===
+    print """=== pricedog cotrol v0.1.0 ===
 Usage:
     pricedog_ctl.py <command> <arg1> ... <argN>
 Command details:
