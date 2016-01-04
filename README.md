@@ -9,9 +9,9 @@
 базы данных SQLite: **$HOME/.config/pricedog/pricedog.db**
 
 ## Зависимости
-* python >= 2.7
+* python (>= 2.7)
 
-## Usage
+## Использование
 ```bash
 === pricedog control v0.1.0 ===
 Usage:
